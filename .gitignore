@@ -1,0 +1,7 @@
+# your own editor set-up (paths on your PC)
+.luarc.json
+
+# written by the mod on the player's PC
+debug.txt
+log.txt
+*.tmp
