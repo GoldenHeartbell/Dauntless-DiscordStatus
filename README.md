@@ -2,48 +2,57 @@
 
 Shows where you are and which weapon you're using on your Discord profile, instead of just "Playing Dauntless".
 
+By GoldenHeartbell. Version 0.1.0. Licence: AGPL-3.0 (see [LICENSE](LICENSE)).
+
+## What Discord shows
+
 ```
 Playing Dauntless
-Umbral Escalation 10-50 - Round 3
-Sword, level 6
-1:02:34 elapsed
+Hunting Grounds: Emberthorn Cove        <- where you are
+Sword, level 6                          <- the weapon in your hands and its level
+1:02:34 elapsed                         <- how long the game has been running
 ```
 
-## What it shows
+Where you are can be:
 
-- **Where you are:** Ramsgate, the Hunting Grounds island you're on, Escalations (element, tier and round), Trials,
-  the Gauntlet (with your level) and the Training Grounds.
-- **Your weapon:** the weapon type in your hands and its level. It updates when you switch.
-- **How long you've been playing:** the timer runs from when you start the game until you close it.
+| Place | Shown as |
+| --- | --- |
+| Ramsgate | In Ramsgate |
+| Hunting Grounds | Hunting Grounds: *island name* |
+| Escalation | *Umbral Escalation 1-13*, *Umbral Escalation 10-50* or *Heroic Umbral Escalation 51-90*, plus the round you are on |
+| Trials | Elite Trials (or Hard Trials) |
+| The Gauntlet | The Gauntlet - Level *n* |
+| Training Grounds | Training Grounds |
 
-It fills in the normal Dauntless entry on your profile, with the game's own artwork. There's nothing to set up in
-Discord. When you close the game, the status clears by itself.
+Your weapon updates when you switch. It shows the weapon type ("Sword"), not the weapon's own name yet.
+
+The lines go into the normal "Playing Dauntless" entry Discord already shows for the game, with the game's own
+artwork: the mod uses Discord's own Dauntless application, so there is nothing to set up in Discord. When you close
+the game, the status clears by itself.
 
 ## What you need
 
-- Dauntless 1.14.7 through the Dauntless Forever launcher, with Modded mode on (UE4SS 3.0.1)
-- The Discord desktop app running on the same PC (Discord in a browser won't work)
-- In Discord: Settings > Activity Privacy > "Share your detected activities with others" turned on
+- Dauntless 1.14.7 through the Dauntless Forever launcher, with **Modded mode** on (UE4SS 3.0.1).
+- The Discord desktop app, running on the same PC. (Discord in a browser can't be reached by games.)
+- In Discord: Settings > Activity Privacy > **Share your detected activities with others** on.
 
 ## Install
 
-1. Copy the [`mod/DiscordStatus`](mod/DiscordStatus) folder into `<game folder>\Archon\Binaries\Win64\ue4ss\Mods\`.
-2. Start the game. That's all: there are no keys and no settings.
+1. Download `DiscordStatus-<version>.zip` from [Releases](https://github.com/GoldenHeartbell/Dauntless-DiscordStatus/releases)
+   and unzip it.
+2. Copy the `DiscordStatus` folder into `<game folder>\Archon\Binaries\Win64\ue4ss\Mods\`.
+3. Start the game. That's all: there are no keys and no settings.
 
-To turn it off, delete the folder or remove `enabled.txt` from it.
+To turn it off, delete the folder (or remove `enabled.txt` from it).
 
-## Good to know
+## Problems?
 
-- It's Lua only, no DLL. It only talks to the Discord app on your own PC, and nothing is sent anywhere else.
-- It's light on the game: it reads the game once every 5 seconds.
-- It shows the weapon type ("Sword"), not the weapon's own name yet.
+Look in `ue4ss\UE4SS.log` for lines starting with `[DiscordStatus]` (hooks, places, what it sent to Discord). Post
+them together with what Discord showed.
 
-**Problems?** Look in `ue4ss\UE4SS.log` for lines starting with `[DiscordStatus]` and post them, together with what
-Discord showed.
+## How it works (for the curious)
 
-## The code
-
-Everything is in [`mod/DiscordStatus/Scripts`](mod/DiscordStatus/Scripts):
+Everything is Lua, no DLL, in the [`Scripts`](Scripts) folder:
 
 | File | What it does |
 | --- | --- |
@@ -53,6 +62,9 @@ Everything is in [`mod/DiscordStatus/Scripts`](mod/DiscordStatus/Scripts):
 | `ds_names.lua` | island, escalation and weapon type names |
 | `ds_helpers.lua` | small shared helpers, and which process this is |
 
-## Licence
+Every 5 seconds (from a hook on your Slayer's tick, so it runs on the game's own thread) the script reads the game:
+the hunt you are on, the escalation or Gauntlet round, and your weapon. When something changed, it tells the Discord
+app on your PC over Discord's local "Rich Presence" pipe. The script only writes to that pipe, so the game never
+waits for Discord. Nothing is sent anywhere else.
 
-AGPL-3.0, see [LICENSE](LICENSE). By GoldenHeartbell.
+The hunt servers that run on your PC load the same mods; the script recognises them and does nothing there.
